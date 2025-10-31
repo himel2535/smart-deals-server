@@ -30,8 +30,9 @@ async function run() {
 
     const db = client.db("smart_db");
     const productsCollection = db.collection("products");
+    const bidsCollection = db.collection("bids");
 
-    // ----Get All----
+    // ----Get All Products----
     app.get("/products", async (req, res) => {
       // const projectFields = { title: 1, price_min: 1, price_max: 1, image: 1 };
       // const cursor = productsCollection
@@ -53,7 +54,7 @@ async function run() {
       res.send(result);
     });
 
-    // ----Get One----
+    // ----Get One Products----
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -61,14 +62,14 @@ async function run() {
       res.send(result);
     });
 
-    // ----Create----
+    // ----Create Products----
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       const result = await productsCollection.insertOne(newProduct);
       res.send(result);
     });
 
-    // ----Update----
+    // ----Update Products----
     app.patch("/products/:id", async (req, res) => {
       const id = req.params;
       const query = { _id: new ObjectId(id) };
@@ -80,11 +81,33 @@ async function run() {
       res.send(result);
     });
 
-    // ----Delete----
+    // ----Delete Products----
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
       query = { _id: new ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // ------------For Bids-----------
+
+    // ----Get All Bids-------
+    app.get("/bids", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.buyer_email = email;
+      }
+
+      const cursor = bidsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // -----Create Bid-----
+    app.post("/bids", async (req, res) => {
+      const newBid = req.body;
+      const result = await bidsCollection.insertOne(newBid);
       res.send(result);
     });
 
